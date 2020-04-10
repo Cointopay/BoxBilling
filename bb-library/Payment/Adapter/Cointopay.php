@@ -46,7 +46,7 @@ class Payment_Adapter_Cointopay
     	$prams = $this->getOneTimePaymentFields($invoice);
     	$curl_result = $this->_processCURL($prams);
 
-        return $this->_generateForm($curl_result['shortURL'], $data);
+        return $this->_generateForm($curl_result['RedirectURL'], $data);
     }
 
     public function getOneTimePaymentFields(array $invoice){
@@ -118,6 +118,9 @@ class Payment_Adapter_Cointopay
         }
 
         $response = json_decode($json_response, true);
+		if (is_string($response)){
+				echo '<h3>BadCredentials:'.$response.'</h3>';
+		}
         curl_close($ch);
 
         return $response;
@@ -168,6 +171,40 @@ class Payment_Adapter_Cointopay
     	$auto_redirect = false;
 
         if(!$tx['txn_status'] && isset($ipn['status'])) {
+			$transactionData = $this->getTransactiondetail($ipn);
+			if(200 !== $transactionData['status_code']){
+			throw new Exception($transactionData['message']);
+			}
+			else{
+					if($transactionData['data']['Security'] != $ipn['ConfirmCode']){
+						throw new Exception("Data mismatch! ConfirmCode doesn\'t match");
+					}
+					elseif($transactionData['data']['CustomerReferenceNr'] != $ipn['CustomerReferenceNr']){
+						throw new Exception("Data mismatch! CustomerReferenceNr doesn\'t match");
+					}
+					elseif($transactionData['data']['TransactionID'] != $ipn['TransactionID']){
+						throw new Exception("Data mismatch! TransactionID doesn\'t match");
+					}
+					elseif($transactionData['data']['AltCoinID'] != $ipn['AltCoinID']){
+						throw new Exception("Data mismatch! AltCoinID doesn\'t match");
+					}
+					elseif($transactionData['data']['MerchantID'] != $ipn['MerchantID']){
+						throw new Exception("Data mismatch! MerchantID doesn\'t match");
+					}
+					elseif($transactionData['data']['coinAddress'] != $ipn['CoinAddressUsed']){
+						throw new Exception("Data mismatch! coinAddress doesn\'t match");
+					}
+					elseif($transactionData['data']['SecurityCode'] != $ipn['SecurityCode']){
+						throw new Exception("Data mismatch! SecurityCode doesn\'t match");
+					}
+					elseif($transactionData['data']['inputCurrency'] != $ipn['inputCurrency']){
+						throw new Exception("Data mismatch! inputCurrency doesn\'t match");
+					}
+					elseif($transactionData['data']['Status'] != $ipn['status']){
+						throw new Exception("Data mismatch! status doesn\'t match. Your order status is ".$transactionData['data']['Status']);
+					}
+					
+				}
 
 	        $ipn_status = $ipn['status'];
 
@@ -220,6 +257,21 @@ class Payment_Adapter_Cointopay
 
     	if($auto_redirect) header("Refresh: 3; URL=".$back_url);
     	exit;
+    }
+	public function getTransactiondetail($data) {
+        $validate = true;
+
+        $merchant_id =  $this->config['cointopay_merchant_id'];
+        $confirm_code = $data['ConfirmCode'];
+        $url = "https://cointopay.com/v2REAPI?Call=Transactiondetail&MerchantID=".$merchant_id."&output=json&ConfirmCode=".$confirm_code."&APIKey=a";
+        $curl = curl_init($url);
+        curl_setopt_array($curl, array(
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_SSL_VERIFYPEER => 0
+        ));
+        $result = curl_exec($curl);
+        $result = json_decode($result, true);
+        return $result;
     }
 
 }

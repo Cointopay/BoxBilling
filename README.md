@@ -1,4 +1,6 @@
-﻿Cointopay.com Payment Gateway Plugin for BillBoxing
+﻿Cointopay.com Payment Gateway Plugin for BoxBilling
+
+Please follow the BoxBilling Cointopay Plugin install instructions mentioned here: <a href="https://docs.google.com/document/d/1l9LlkEJPDchI_8qceN2uVnvMGJwVNVVtEl73JfjA8YA/edit?usp=sharing">download BoxBilling Cointopay Plugin documentation</a> or direct link: https://docs.google.com/document/d/1l9LlkEJPDchI_8qceN2uVnvMGJwVNVVtEl73JfjA8YA/edit?usp=sharing
 
 ---------------------------------------------------
 
