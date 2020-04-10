@@ -45,6 +45,9 @@ class Payment_Adapter_Cointopay
     	$prams = array();
     	$prams = $this->getOneTimePaymentFields($invoice);
     	$curl_result = $this->_processCURL($prams);
+		if (is_string($curl_result)){
+				throw new Exception('BadCredentials:'.$curl_result);
+		}
 
         return $this->_generateForm($curl_result['RedirectURL'], $data);
     }
@@ -118,9 +121,7 @@ class Payment_Adapter_Cointopay
         }
 
         $response = json_decode($json_response, true);
-		if (is_string($response)){
-				echo '<h3>BadCredentials:'.$response.'</h3>';
-		}
+		
         curl_close($ch);
 
         return $response;
