@@ -186,19 +186,19 @@ class Payment_Adapter_Cointopay
 					elseif($transactionData['data']['TransactionID'] != $ipn['TransactionID']){
 						throw new Exception("Data mismatch! TransactionID doesn\'t match");
 					}
-					elseif($transactionData['data']['AltCoinID'] != $ipn['AltCoinID']){
+					elseif(isset($ipn['AltCoinID']) && $transactionData['data']['AltCoinID'] != $ipn['AltCoinID']){
 						throw new Exception("Data mismatch! AltCoinID doesn\'t match");
 					}
-					elseif($transactionData['data']['MerchantID'] != $ipn['MerchantID']){
+					elseif(isset($ipn['MerchantID']) && $transactionData['data']['MerchantID'] != $ipn['MerchantID']){
 						throw new Exception("Data mismatch! MerchantID doesn\'t match");
 					}
-					elseif($transactionData['data']['coinAddress'] != $ipn['CoinAddressUsed']){
+					elseif(isset($ipn['CoinAddressUsed']) && $transactionData['data']['coinAddress'] != $ipn['CoinAddressUsed']){
 						throw new Exception("Data mismatch! coinAddress doesn\'t match");
 					}
-					elseif($transactionData['data']['SecurityCode'] != $ipn['SecurityCode']){
+					elseif(isset($ipn['SecurityCode']) && $transactionData['data']['SecurityCode'] != $ipn['SecurityCode']){
 						throw new Exception("Data mismatch! SecurityCode doesn\'t match");
 					}
-					elseif($transactionData['data']['inputCurrency'] != $ipn['inputCurrency']){
+					elseif(isset($ipn['inputCurrency']) && $transactionData['data']['inputCurrency'] != $ipn['inputCurrency']){
 						throw new Exception("Data mismatch! inputCurrency doesn\'t match");
 					}
 					elseif($transactionData['data']['Status'] != $ipn['status']){
