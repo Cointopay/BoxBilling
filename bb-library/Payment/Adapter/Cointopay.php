@@ -170,6 +170,16 @@ class Payment_Adapter_Cointopay
     	$ipn_status = "Processed";
     	$back_url = "http://" . $_SERVER['SERVER_NAME'] . "/bb/index.php?_url=/";
     	$auto_redirect = false;
+		
+		// ---- GUARD 1: invoice already paid, or transaction already finalized ----
+		$already_paid_invoice = (isset($invoice['status']) && strtolower($invoice['status']) === 'paid');
+		$already_done_tx = (!empty($tx['txn_status']) && in_array(strtolower($tx['txn_status']), array('paid', 'failed', 'not enough')));
+
+		if ($already_paid_invoice || $already_done_tx) {
+			echo "<h3>Payment already processed.<br><br>&nbsp;&nbsp;Redirecting...<h3>";
+			header("Refresh: 3; URL=".$back_url);
+			exit;
+		}
 
         if(!$tx['txn_status'] && isset($ipn['status'])) {
 			$transactionData = $this->getTransactiondetail($ipn);
@@ -249,7 +259,7 @@ class Payment_Adapter_Cointopay
         $d = array(
             'id'        => $id, 
             'error'     => '',
-            'error_code'=> '',
+            'error_code'=> 0,
 	        'status'    => $ipn_status,
             'updated_at'=> date('Y-m-d H:i:s'),
         );
