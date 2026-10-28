@@ -168,7 +168,7 @@ class Payment_Adapter_Cointopay
     	    'type'          =>  'Cointopay',
     	);
     	$ipn_status = "Processed";
-    	$back_url = "http://" . $_SERVER['SERVER_NAME'] . "/bb/index.php?_url=/";
+    	$back_url = "http://" . $_SERVER['SERVER_NAME'] . "/";
     	$auto_redirect = false;
 		
 		// ---- GUARD 1: invoice already paid, or transaction already finalized ----
@@ -211,7 +211,19 @@ class Payment_Adapter_Cointopay
 					elseif(isset($ipn['inputCurrency']) && $transactionData['data']['inputCurrency'] != $ipn['inputCurrency']){
 						throw new Exception("Data mismatch! inputCurrency doesn\'t match");
 					}
-					elseif($transactionData['data']['Status'] != $ipn['status']){
+					elseif (
+						 $transactionData['data']['Status'] !== $ipn['status']
+						&& !isset($ipn['cancel'])
+						&& !(
+							strtolower($ipn['status']) === 'paid'
+							&& isset($ipn['notenough'])
+							&& $ipn['notenough'] == 1
+						)
+						&& !(
+							strtolower( $transactionData['data']['Status']) === 'expired'
+							&& strtolower($ipn['status']) === 'failed'
+						)
+					) {
 						throw new Exception("Data mismatch! status doesn\'t match. Your order status is ".$transactionData['data']['Status']);
 					}
 					
