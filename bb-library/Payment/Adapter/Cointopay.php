@@ -10,15 +10,15 @@ class Payment_Adapter_Cointopay
         $this->config = $config;
 
         if ( ! function_exists('curl_exec')) {
-            throw new Exception('PHP Curl extension must be enabled in order to use Cointopay.com gateway');
+            throw new Payment_Exception('PHP Curl extension must be enabled in order to use Cointopay.com gateway');
         }
 
         if ( ! $this->config['cointopay_merchant_id']) {
-            throw new Exception('Cointopay.com Merchant ID is not configured properly. Please update under: "Configuration -> Payments"');
+            throw new Payment_Exception('Cointopay.com Merchant ID is not configured properly. Please update under: "Configuration -> Payments"');
         }
 
         if ( ! $this->config['cointopay_security_code']) {
-            throw new Exception('Cointopay.com Security Code is not configured properly. Please update under: "Configuration -> Payments"');
+            throw new Payment_Exception('Cointopay.com Security Code is not configured properly. Please update under: "Configuration -> Payments"');
         }
 
     }
@@ -46,7 +46,7 @@ class Payment_Adapter_Cointopay
     	$prams = $this->getOneTimePaymentFields($invoice);
     	$curl_result = $this->_processCURL($prams);
 		if (is_string($curl_result)){
-				throw new Exception('BadCredentials:'.$curl_result);
+				throw new Payment_Exception('BadCredentials:'.$curl_result);
 		}
 
         return $this->_generateForm($curl_result['RedirectURL'], $data);
@@ -176,7 +176,7 @@ class Payment_Adapter_Cointopay
 		$already_done_tx = (!empty($tx['txn_status']) && in_array(strtolower($tx['txn_status']), array('paid', 'failed', 'not enough')));
 
 		if ($already_paid_invoice || $already_done_tx) {
-			echo "<h3>Payment already processed.<br><br>&nbsp;&nbsp;Redirecting...<h3>";
+			echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:green;">Payment Received Successfully. <br><br>&nbsp;&nbsp;Redirecting..</h3></div>';
 			header("Refresh: 3; URL=".$back_url);
 			exit;
 		}
@@ -184,32 +184,152 @@ class Payment_Adapter_Cointopay
         if(!$tx['txn_status'] && isset($ipn['status'])) {
 			$transactionData = $this->getTransactiondetail($ipn);
 			if(200 !== $transactionData['status_code']){
-			throw new Exception($transactionData['message']);
+			throw new Payment_Exception($transactionData['message']);
 			}
 			else{
 					if($transactionData['data']['Security'] != $ipn['ConfirmCode']){
-						throw new Exception("Data mismatch! ConfirmCode doesn\'t match");
+						echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Data mismatch! ConfirmCode doesn\'t match.</h3>';
+						echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
+							display: block;
+							background-color: #3F51B5;
+							padding: 10px 38px;
+							color: #fff;
+							text-transform: uppercase;
+							text-decoration: none;
+							width: 100px!important;
+							max-width: unset;
+							/* clear: both; */
+							margin: 20px auto 0;
+						line-height: 25px;">
+								Go to home
+							</a></div>';
+							exit;
 					}
 					elseif($transactionData['data']['CustomerReferenceNr'] != $ipn['CustomerReferenceNr']){
-						throw new Exception("Data mismatch! CustomerReferenceNr doesn\'t match");
+						echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Data mismatch! CustomerReferenceNr doesn\'t match.</h3>';
+						echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
+							display: block;
+							background-color: #3F51B5;
+							padding: 10px 38px;
+							color: #fff;
+							text-transform: uppercase;
+							text-decoration: none;
+							width: 100px!important;
+							max-width: unset;
+							/* clear: both; */
+							margin: 20px auto 0;
+						line-height: 25px;">
+								Go to home
+							</a></div>';
+							exit;
 					}
 					elseif($transactionData['data']['TransactionID'] != $ipn['TransactionID']){
-						throw new Exception("Data mismatch! TransactionID doesn\'t match");
+						echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Data mismatch! TransactionID doesn\'t match.</h3>';
+						echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
+							display: block;
+							background-color: #3F51B5;
+							padding: 10px 38px;
+							color: #fff;
+							text-transform: uppercase;
+							text-decoration: none;
+							width: 100px!important;
+							max-width: unset;
+							/* clear: both; */
+							margin: 20px auto 0;
+						line-height: 25px;">
+								Go to home
+							</a></div>';
+							exit;
 					}
 					elseif(isset($ipn['AltCoinID']) && $transactionData['data']['AltCoinID'] != $ipn['AltCoinID']){
-						throw new Exception("Data mismatch! AltCoinID doesn\'t match");
+						echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Data mismatch! AltCoinID doesn\'t match.</h3>';
+						echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
+							display: block;
+							background-color: #3F51B5;
+							padding: 10px 38px;
+							color: #fff;
+							text-transform: uppercase;
+							text-decoration: none;
+							width: 100px!important;
+							max-width: unset;
+							/* clear: both; */
+							margin: 20px auto 0;
+						line-height: 25px;">
+								Go to home
+							</a></div>';
+							exit;
 					}
 					elseif(isset($ipn['MerchantID']) && $transactionData['data']['MerchantID'] != $ipn['MerchantID']){
-						throw new Exception("Data mismatch! MerchantID doesn\'t match");
+						echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Data mismatch! MerchantID doesn\'t match.</h3>';
+						echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
+							display: block;
+							background-color: #3F51B5;
+							padding: 10px 38px;
+							color: #fff;
+							text-transform: uppercase;
+							text-decoration: none;
+							width: 100px!important;
+							max-width: unset;
+							/* clear: both; */
+							margin: 20px auto 0;
+						line-height: 25px;">
+								Go to home
+							</a></div>';
+							exit;
 					}
 					elseif(isset($ipn['CoinAddressUsed']) && $transactionData['data']['coinAddress'] != $ipn['CoinAddressUsed']){
-						throw new Exception("Data mismatch! coinAddress doesn\'t match");
+						echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Data mismatch! CoinAddressUsed doesn\'t match.</h3>';
+						echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
+							display: block;
+							background-color: #3F51B5;
+							padding: 10px 38px;
+							color: #fff;
+							text-transform: uppercase;
+							text-decoration: none;
+							width: 100px!important;
+							max-width: unset;
+							/* clear: both; */
+							margin: 20px auto 0;
+						line-height: 25px;">
+								Go to home
+							</a></div>';
+							exit;
 					}
 					elseif(isset($ipn['SecurityCode']) && $transactionData['data']['SecurityCode'] != $ipn['SecurityCode']){
-						throw new Exception("Data mismatch! SecurityCode doesn\'t match");
+						echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Data mismatch! SecurityCode doesn\'t match.</h3>';
+						echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
+							display: block;
+							background-color: #3F51B5;
+							padding: 10px 38px;
+							color: #fff;
+							text-transform: uppercase;
+							text-decoration: none;
+							width: 100px!important;
+							max-width: unset;
+							/* clear: both; */
+							margin: 20px auto 0;
+						line-height: 25px;">
+								Go to home
+							</a></div>';
+							exit;
 					}
 					elseif(isset($ipn['inputCurrency']) && $transactionData['data']['inputCurrency'] != $ipn['inputCurrency']){
-						throw new Exception("Data mismatch! inputCurrency doesn\'t match");
+						echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Data mismatch! inputCurrency doesn\'t match.</h3>';
+						echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
+							display: block;
+							background-color: #3F51B5;
+							padding: 10px 38px;
+							color: #fff;
+							text-transform: uppercase;
+							text-decoration: none;
+							width: 100px!important;
+							max-width: unset;
+							/* clear: both; */
+							margin: 20px auto 0;
+						line-height: 25px;">
+								Go to home
+							</a></div>';
+							exit;
 					}
 					elseif (
 						 $transactionData['data']['Status'] !== $ipn['status']
@@ -224,7 +344,22 @@ class Payment_Adapter_Cointopay
 							&& strtolower($ipn['status']) === 'failed'
 						)
 					) {
-						throw new Exception("Data mismatch! status doesn\'t match. Your order status is ".$transactionData['data']['Status']);
+						echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Data mismatch! status doesn\'t match. Your order status is '.$transactionData['data']['Status'].'</h3>';
+						echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
+							display: block;
+							background-color: #3F51B5;
+							padding: 10px 38px;
+							color: #fff;
+							text-transform: uppercase;
+							text-decoration: none;
+							width: 100px!important;
+							max-width: unset;
+							/* clear: both; */
+							margin: 20px auto 0;
+						line-height: 25px;">
+								Go to home
+							</a></div>';
+							exit;
 					}
 					
 				}
@@ -242,26 +377,66 @@ class Payment_Adapter_Cointopay
 
 	            $ipn_status = "Paid";
         		$auto_redirect = true;
-        		echo "<h3>Payment Received Successfully. <br><br>&nbsp;&nbsp;Redirecting...<h3>";
+				echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:green;">Payment Received Successfully. <br><br>&nbsp;&nbsp;Redirecting..</h3></div>';
 
-	        } else if(strtolower($ipn_status)=="cancel") {
+	        } elseif(strtolower($ipn_status)=="cancel") {
 
         		$ipn_status = "Failed";
-        		echo "<h3>Payment Failed. Contact site admin.<h3>";
-        		echo "<a href='".$back_url."'>Home</a>";
+        		echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Payment Failed. Contact site admin.</h3>';
+				echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
+						display: block;
+						background-color: #3F51B5;
+						padding: 10px 38px;
+						color: #fff;
+						text-transform: uppercase;
+						text-decoration: none;
+						width: 100px!important;
+						max-width: unset;
+						/* clear: both; */
+						margin: 20px auto 0;
+					line-height: 25px;">
+										Go to home
+									</a></div>';
 
-	        } else if(isset($ipn['notenough']) && $ipn['notenough']=="1") {
+	        } elseif(isset($ipn['notenough']) && $ipn['notenough']=="1") {
 
         		$ipn_status = "Not Enough";
-        		echo "<h3>Payment Received but not enough. Contact site admin.<h3>";
-        		echo "<a href='".$back_url."'>Home</a>";
+        		echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Payment Received but not enough. Contact site admin</h3>';
+				echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
+						display: block;
+						background-color: #3F51B5;
+						padding: 10px 38px;
+						color: #fff;
+						text-transform: uppercase;
+						text-decoration: none;
+						width: 100px!important;
+						max-width: unset;
+						/* clear: both; */
+						margin: 20px auto 0;
+					line-height: 25px;">
+										Go to home
+									</a></div>';
         		error_log("Transaction#".$ipn['TransactionID']." Freezed due to not enough payment. Cointopay: Line#205");
 
 	        } else { 
 
         		$ipn_status = $ipn['status'];
-        		echo "<h3>Payment Failed. Contact site admin.<h3>";
-        		echo "<a href='".$back_url."'>Home</a>";
+        		echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Payment Failed. Contact site admin.</h3>';
+				echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
+						display: block;
+						background-color: #3F51B5;
+						padding: 10px 38px;
+						color: #fff;
+						text-transform: uppercase;
+						text-decoration: none;
+						width: 100px!important;
+						max-width: unset;
+						/* clear: both; */
+						margin: 20px auto 0;
+					line-height: 25px;">
+										Go to home
+									</a></div>';
+
 
 	        }
 
