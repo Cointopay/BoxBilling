@@ -382,7 +382,7 @@ class Payment_Adapter_Cointopay
 	        } elseif(strtolower($ipn_status)=="cancel") {
 
         		$ipn_status = "Failed";
-        		echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Payment Failed. Contact site admin.</h3>';
+        		echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Payment Failed.</h3>';
 				echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
 						display: block;
 						background-color: #3F51B5;
@@ -401,7 +401,7 @@ class Payment_Adapter_Cointopay
 	        } elseif(isset($ipn['notenough']) && $ipn['notenough']=="1") {
 
         		$ipn_status = "Not Enough";
-        		echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Payment Received but not enough. Contact site admin</h3>';
+        		echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Payment Received but not enough.</h3>';
 				echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
 						display: block;
 						background-color: #3F51B5;
@@ -421,7 +421,7 @@ class Payment_Adapter_Cointopay
 	        } else { 
 
         		$ipn_status = $ipn['status'];
-        		echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Payment Failed. Contact site admin.</h3>';
+        		echo '<div style="width:80%;display:table;margin:10% auto 0 auto;padding:6% 20px;background-color:#dadada;text-align:center;"><h3 style="text-align:center;color:red;">Payment Failed.</h3>';
 				echo '<a class="btn btn-default btn-block" href="'.$back_url.'" title="Go to home" style="
 						display: block;
 						background-color: #3F51B5;
